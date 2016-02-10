@@ -1,0 +1,633 @@
+@ apex/core/pages/f100_page_608.sql;
+
+@ apex/core/pages/f100_page_358.sql;
+@ apex/core/pages/f100_page_359.sql;
+
+@ apex/core/lists/f100_list_meni-glavni.sql;
+
+@ apex/core/pages/f100_page_696.sql;
+
+@ apex/core/breadcrumbs/f100_breadcrumb_glavni.sql;
+@ apex/core/pages/f100_page_138.sql;
+@ apex/core/pages/f100_page_139.sql;
+@ apex/core/pages/f100_page_345.sql;
+@ apex/core/pages/f100_page_348.sql;
+--  PUŠTENO NA COTEST!!!!!!!!!!
+alter table hrm.UTL_REPORT add VRSTA varchar2(20);
+comment on column hrm.UTL_REPORT.VRSTA
+  is 'Vrsta J-Jasper, B-BIP, R-Oracle reports';
+@ hrm/views/v$utl_urt.sql;
+
+update hrm.utl_report set vrsta='R' where kon_id=3000 and oznaka in ('r00230','r00247','r00270','r00263','r00334');
+commit;
+
+-- KRAJ PUŠTENO NA COTEST!!!!!!!!!!
+grant execute on hrmbl.errors to hrmpr;
+
+@ hrmbl/packages/p$bl_obrpla.pkb;
+@ hrmbl/packages/p$bl_obrpla.pks;
+@ hrmbl/packages/p$bl_place_bilog.pkb;
+@ hrmbl/packages/place.pkb;
+@ hrmbl/packages/place_provjera.pkb;
+@ hrmbl/views/v$bl_plana.sql;
+@ hrmbl/views/v$bl_vrpri_formula.sql;
+
+
+grant execute on hrm.type_num15 to hrmbl with grant option;
+grant execute on hrmbl.type_num15 to hrmpr;
+
+@ hrmbl/views/v_joppd_forma.sql;
+@ hrmbl/packages/p$bl_joppd.pks;
+@ hrmbl/packages/p$bl_joppd.pkb;
+
+-- PUŠTENO NA COTEST!!!!!!!!!!
+alter table hrm.REPORT_LOG add URT_VRSTA VARCHAR2(20 CHAR);
+comment on column hrm.REPORT_LOG.URT_VRSTA
+  is 'Vrsta reporta';
+
+@ hrmbl/packages/p$utl_rep.pkb;
+-- KRAJ PUŠTENO NA COTEST!!!!!!!!!!
+-- samo za AH
+-- insert into utl group
+insert into HRM.UTL_REP_GRUPA 
+    (ID, NAZIV, AKTIVNO)
+values 
+   (HRM.seq_id.nextval, 'Procjenjivanje', 1);
+
+--insert into report 
+insert into HRM.UTL_REPORT 
+        (OZNAKA,FILE_NAME,OPIS,PAGE_NUMBER,NAZIV,AKTIVNO,KON_ID,VRSTA) 
+values ('i0030','i0030',null,361,'Pregled stimulacija',1,2110,null);
+
+-- map group
+insert into HRM.UTL_REP_GRUPIRANJE
+  (URGA_ID, POREDAK, KON_ID, URT_OZNAKA)
+  values
+  ((SELECT ID
+    FROM HRM.UTL_REP_GRUPA
+    WHERE naziv = 'Procjenjivanje') , 1, 2110, 'i0030');
+
+@ apex/core/pages/f100_page_361.sql;
+-- kraj samo za AH:
+
+
+@ hrmbl/views/pravna_organizacija.sql;
+grant select on hrmbl.pravna_organizacija to hrmpr;
+
+@ hrmbl/packages/p$bl_orgjedhij_tree.pkb;
+@ hrmbl/views/vc_hij_orgjed_period.sql;
+
+@ hrmbl/procedures/kopirajhijerarhijuoj.sql;
+@ hrmbl/packages/place.pkb;
+
+@ apex/core/pages/f100_page_696.sql;
+
+-- kopirati
+-- apex/static_files/hrmb/plugins/evidencija_kalendar/js/evidencija_kalendar_1.0.1.js
+
+@ hrmbl/packages/p$bl_eva_portal5.pkb;
+
+@ hrmbl/packages/p$bl_godisnji.pks;
+@ hrmbl/packages/p$bl_godisnji.pkb;
+@ apex/portal5/pages/f101_page_176.sql;
+
+-- PUŠTENO NA COTEST!!!!!!!!!!
+-----------------------------------
+-- Rekapitulacija plaće (analitika/sintetika)
+--
+--
+
+-- insert into utl group (analitika)
+insert into HRM.UTL_REP_GRUPIRANJE
+  (URGA_ID, POREDAK, KON_ID, URT_OZNAKA)
+  values
+  ((SELECT ID
+    FROM HRM.UTL_REP_GRUPA
+    WHERE naziv = 'Rekapitulacija') , 1, 3000, 'r00334');
+
+
+-- insert into utl group (sintetika)
+insert into HRM.UTL_REP_GRUPIRANJE
+  (URGA_ID, POREDAK, KON_ID, URT_OZNAKA)
+  values
+  ((SELECT ID
+    FROM HRM.UTL_REP_GRUPA
+    WHERE naziv = 'Rekapitulacija') , 1, 3000, 'r00270');
+
+
+-- update set page call report (prmomjena naziva, prikaz u IR)
+UPDATE hrm.utl_report 
+   set page_number = 294,
+       naziv = 'Rekapitulacija plaće - analitika'
+where  oznaka = 'r00334';
+
+UPDATE hrm.utl_report 
+   set naziv = 'Rekapitulacija plaće - sintetika',
+       page_number = 341
+where  oznaka in 'r00270';
+
+-- insert into report table mapping
+Insert into HRM.UTL_REP_PAGE_PARAMS (PAGE_ID,ITEM,PARAMETAR,URT_OZNAKA,POREDAK) values (341,'P341_PRAORG_ID','PRAORG_ID','r00270',1);
+Insert into HRM.UTL_REP_PAGE_PARAMS (PAGE_ID,ITEM,PARAMETAR,URT_OZNAKA,POREDAK) values (341,'P341_ORGJED_ID','ORGJED_ID','r00270',2);
+Insert into HRM.UTL_REP_PAGE_PARAMS (PAGE_ID,ITEM,PARAMETAR,URT_OZNAKA,POREDAK) values (341,'P341_MJESEC','MJESEC','r00270',3);
+Insert into HRM.UTL_REP_PAGE_PARAMS (PAGE_ID,ITEM,PARAMETAR,URT_OZNAKA,POREDAK) values (341,'P341_GODINA','GODINA','r00270',4);
+Insert into HRM.UTL_REP_PAGE_PARAMS (PAGE_ID,ITEM,PARAMETAR,URT_OZNAKA,POREDAK) values (341,'P341_OBRPLA_ID','OBRPLA_ID','r00270',5);
+Insert into HRM.UTL_REP_PAGE_PARAMS (PAGE_ID,ITEM,PARAMETAR,URT_OZNAKA,POREDAK) values (341,'P341_HIJ_FLAG','HIJ_FLAG','r00270',6);
+
+COMMIT;
+
+@ apex/core/lists/f100_lov_vrste_analitike.sql;
+@ apex/core/pages/f100_page_294.sql;
+@ apex/core/pages/f100_page_341.sql;
+
+insert into hrm.konfiguracija(id, oznaka, vrijednost, komentar, kon_id,user_created, date_created)
+     select hrm.seq_id.nextval, 'RDF_REPORT_SERVER', 'http://10.73.0.122:7778/reports/rwservlet?server=rep_hr', 'Oracle reports link', kon.id,
+            user, sysdate
+       from hrm.kontekst kon;
+insert into hrm.konfiguracija(id, oznaka, vrijednost, komentar, kon_id,user_created, date_created)
+     select hrm.seq_id.nextval, 'RDF_REPORT_USERID', 'hrmpr/hrmpr@hrmb5.bilog.local', 'Oracle reports userid', kon.id,
+            user, sysdate
+       from hrm.kontekst kon;
+commit;
+
+@ hrmbl/packages/p$utl_rep.pks;
+@ hrmbl/packages/p$utl_rep.pkb;
+
+@ hrmbl/views/v_isplata_obracun.sql;
+@ hrmbl/views/pravna_organizacija.sql;
+@ hrmbl/views/hijerarhija.sql;
+@ hrmbl/views/hijerarhija_verzija.sql;
+@ hrmbl/views/hijerarhija_org_jedinice.sql;
+@ hrmbl/views/hijerarhija_praorg.sql;
+@ hrmbl/views/hijerarhija_praorg_stavka.sql;
+@ hrmbl/views/v_hij_all_oj.sql;
+@ hrmbl/views/v_hij_groso_all.sql;
+@ hrmbl/views/v_hij_orgjed_all.sql;
+@ hrmbl/views/v_hij_orgjed_naziv.sql;
+@ hrmbl/views/v_hij_orgjed_form.sql;
+@ hrmbl/views/vd_org_jedinica.sql;
+@ hrmbl/views/vd_osoba.sql;
+@ hrmbl/views/vc_grupiranje_prihoda.sql;
+@ hrmbl/views/vc_hij_orgjed.sql;
+@ hrmbl/views/vc_hij_orgjed_naziv.sql;
+@ hrmbl/packages/pck_context.pks;
+@ hrmbl/packages/pck_context.pkb;
+@ hrmbl/views/vc_hij_orgjed_period.sql;
+@ hrmbl/views/vc_hij_orgjed_period_plasin.sql;
+@ hrmbl/views/vc_obracun_vrsta.sql;
+@ hrmbl/views/vc_oso_period_di_plasin.sql;
+@ hrmbl/views/vc_oso_period_plasin.sql;
+@ hrmbl/views/vc_plasin_dimenzija.sql;
+@ hrmbl/views/vc_plasin_mt.sql;
+@ hrmbl/views/vc_vrsta_prihoda.sql;
+@ hrmbl/views/vc_vrsta_rashoda.sql;
+@ hrmbl/views/tmp_hij_orgjed.sql;
+@ hrmbl/views/tmp_hij_orgjed_period.sql;
+@ hrmbl/views/tmp_hij_orgjed_period_plasin.sql;
+@ hrmbl/views/tmp_isplata_obracun.sql;
+@ hrmbl/views/tmp_oso_period_di_plasin.sql;
+@ hrmbl/views/tmp_oso_period_plasin.sql;
+@ hrmbl/views/rep_r00230.sql;
+@ hrmbl/views/rep_r00247.sql;
+@ hrmbl/views/rep_r00263.sql;
+@ hrmbl/views/rep_r00263_doprinosi_iz.sql;
+@ hrmbl/views/rep_r00263_doprinosi_na.sql;
+@ hrmbl/views/rep_r00263_naknade.sql;
+@ hrmbl/views/rep_r00263_obustave.sql;
+@ hrmbl/views/rep_r00263_porez.sql;
+@ hrmbl/views/rep_r00270.sql;
+@ hrmbl/views/rep_r00334.sql;
+@ hrmbl/views/tmp_rep_r00230.sql;
+
+grant select on hrmbl.rep_r00230 to hrmpr;
+grant select on hrmbl.rep_r00247 to hrmpr;
+grant select on hrmbl.rep_r00263 to hrmpr;
+grant select on hrmbl.rep_r00263_doprinosi_iz to hrmpr;
+grant select on hrmbl.rep_r00263_doprinosi_na to hrmpr;
+grant select on hrmbl.rep_r00263_naknade to hrmpr;
+grant select on hrmbl.rep_r00263_obustave to hrmpr;
+grant select on hrmbl.rep_r00263_porez to hrmpr;
+grant select on hrmbl.rep_r00270 to hrmpr;
+grant select on hrmbl.rep_r00334 to hrmpr;
+grant select on hrmbl.tmp_rep_r00230 to hrmpr;
+grant select on hrmbl.v_hij_orgjed_form to hrmpr;
+
+create or replace synonym hrmpr.rep_r00230 for hrmbl.rep_r00230;
+create or replace synonym hrmpr.rep_r00247 for hrmbl.rep_r00247;
+create or replace synonym hrmpr.rep_r00263 for hrmbl.rep_r00263;
+create or replace synonym hrmpr.rep_r00263_doprinosi_iz for hrmbl.rep_r00263_doprinosi_iz;
+create or replace synonym hrmpr.rep_r00263_doprinosi_na for hrmbl.rep_r00263_doprinosi_na;
+create or replace synonym hrmpr.rep_r00263_naknade for hrmbl.rep_r00263_naknade;
+create or replace synonym hrmpr.rep_r00263_obustave for hrmbl.rep_r00263_obustave;
+create or replace synonym hrmpr.rep_r00263_porez for hrmbl.rep_r00263_porez;
+create or replace synonym hrmpr.rep_r00270 for hrmbl.rep_r00270;
+create or replace synonym hrmpr.rep_r00334 for hrmbl.rep_r00334;
+create or replace synonym hrmpr.tmp_rep_r00230 for hrmbl.tmp_rep_r00230;
+create or replace synonym hrmpr.v_hij_orgjed_form for hrmbl.v_hij_orgjed_form;
+
+@ hrmbl/packages/rep.pks;
+@ hrmbl/packages/rep.pkb;
+@ hrmbl/packages/rep_before_trg.pks;
+@ hrmbl/packages/rep_before_trg.pkb;
+grant execute on hrmbl.rep to hrmpr;
+create or replace synonym hrmpr.rep for hrmbl.rep;
+grant execute on hrmbl.rep_before_trg to hrmpr;
+create or replace synonym hrmpr.rep_before_trg for hrmbl.rep_before_trg;
+-- KRAJ PUŠTENO NA COTEST!!!!!---
+
+
+@ hrmbl/packages/p$bl_predvirst.pks;
+@ hrmbl/packages/p$bl_predvirst.pkb;
+
+@ hrmbl/packages/p$bl_findok.pks;
+@ hrmbl/packages/p$bl_findok.pkb;
+
+@ hrmbl/packages/p$bl_predpl.pks;
+@ hrmbl/packages/p$bl_predpl.pkb;
+
+grant execute on hrmbl.p$bl_predvirst to HRMPR;
+
+@ apex/core/pages/f100_page_367.sql;
+@ apex/core/pages/f100_page_368.sql;
+@ apex/core/pages/f100_page_521.sql;
+@ apex/core/pages/f100_page_520.sql;
+@ apex/core/pages/f100_page_377.sql;
+@ apex/core/pages/f100_page_287.sql;
+@ apex/core/pages/f100_page_422.sql;
+@ apex/core/pages/f100_page_376.sql;
+@ apex/core/pages/f100_page_426.sql;
+@ apex/core/pages/f100_page_428.sql;
+
+------ PUŠTENO NA COTEST!!!!!!!!!!!
+Insert into HRM.UTL_REP_PAGE_PARAMS (PAGE_ID,ITEM,PARAMETAR,URT_OZNAKA,POREDAK) values (294,'P294_PRAORG_ID','PRAORG_ID','r00334',1);
+Insert into HRM.UTL_REP_PAGE_PARAMS (PAGE_ID,ITEM,PARAMETAR,URT_OZNAKA,POREDAK) values (294,'P294_ORGJED_ID','ORGJED_ID','r00334',2);
+Insert into HRM.UTL_REP_PAGE_PARAMS (PAGE_ID,ITEM,PARAMETAR,URT_OZNAKA,POREDAK) values (294,'P294_MJESEC','MJESEC','r00334',3);
+Insert into HRM.UTL_REP_PAGE_PARAMS (PAGE_ID,ITEM,PARAMETAR,URT_OZNAKA,POREDAK) values (294,'P294_GODINA','GODINA','r00334',4);
+Insert into HRM.UTL_REP_PAGE_PARAMS (PAGE_ID,ITEM,PARAMETAR,URT_OZNAKA,POREDAK) values (294,'P294_OBRPLA_ID','OBRPLA_ID','r00334',5);
+Insert into HRM.UTL_REP_PAGE_PARAMS (PAGE_ID,ITEM,PARAMETAR,URT_OZNAKA,POREDAK) values (294,'P294_HIJ_FLAG','HIJ_FLAG','r00334',6);
+Insert into HRM.UTL_REP_PAGE_PARAMS (PAGE_ID,ITEM,PARAMETAR,URT_OZNAKA,POREDAK) values (294,'P294_VRSTA_ANALITIKE','PRIHOD_RASHOD','r00334',12);
+Insert into HRM.UTL_REP_PAGE_PARAMS (PAGE_ID,ITEM,PARAMETAR,URT_OZNAKA,POREDAK) values (294,'P294_VRRAS_ID','VRRAS_ID','r00334',7);
+Insert into HRM.UTL_REP_PAGE_PARAMS (PAGE_ID,ITEM,PARAMETAR,URT_OZNAKA,POREDAK) values (294,'P294_VRPRI_ID','VRPRI_ID','r00334',8);
+Insert into HRM.UTL_REP_PAGE_PARAMS (PAGE_ID,ITEM,PARAMETAR,URT_OZNAKA,POREDAK) values (294,'P294_GRUPRI_ID','GRUPRI_ID','r00334',9);
+Insert into HRM.UTL_REP_PAGE_PARAMS (PAGE_ID,ITEM,PARAMETAR,URT_OZNAKA,POREDAK) values (294,'P294_DODATAK_ID','DODATAK_ID','r00334',10);
+Insert into HRM.UTL_REP_PAGE_PARAMS (PAGE_ID,ITEM,PARAMETAR,URT_OZNAKA,POREDAK) values (294,'P294_OBUSTAVA_ID','OBUSTAVA_ID','r00334',11);
+Insert into HRM.UTL_REP_PAGE_PARAMS (PAGE_ID,ITEM,PARAMETAR,URT_OZNAKA,POREDAK) values (341,'P341_VRSTA_ANALITIKE','PRIHOD_RASHOD','r00270',12);
+Insert into HRM.UTL_REP_PAGE_PARAMS (PAGE_ID,ITEM,PARAMETAR,URT_OZNAKA,POREDAK) values (341,'P341_VRRAS_ID','VRRAS_ID','r00270',7);
+Insert into HRM.UTL_REP_PAGE_PARAMS (PAGE_ID,ITEM,PARAMETAR,URT_OZNAKA,POREDAK) values (341,'P341_VRPRI_ID','VRPRI_ID','r00270',8);
+Insert into HRM.UTL_REP_PAGE_PARAMS (PAGE_ID,ITEM,PARAMETAR,URT_OZNAKA,POREDAK) values (341,'P341_GRUPRI_ID','GRUPRI_ID','r00270',9);
+Insert into HRM.UTL_REP_PAGE_PARAMS (PAGE_ID,ITEM,PARAMETAR,URT_OZNAKA,POREDAK) values (341,'P341_DODATAK_ID','DODATAK_ID','r00270',10);
+Insert into HRM.UTL_REP_PAGE_PARAMS (PAGE_ID,ITEM,PARAMETAR,URT_OZNAKA,POREDAK) values (341,'P341_OBUSTAVA_ID','OBUSTAVA_ID','r00270',11);
+commit;
+
+@ hrmbl/packages/rep.pks;
+@ hrmbl/packages/rep.pkb;
+@ hrmbl/packages/rep_before_trg.pks;
+@ hrmbl/packages/rep_before_trg.pkb;
+
+grant select on hrmbl.obracun_place to hrmpr;
+grant select on hrmbl.pravna_organizacija to hrmpr;
+create or replace synonym hrmpr.obracun_place for hrmbl.obracun_place;
+create or replace synonym hrmpr.pravna_organizacija for hrmbl.pravna_organizacija;
+@ apex/core/pages/f100_page_294.sql;
+@ apex/core/pages/f100_page_341.sql;
+------ KRAJ PUŠTENO NA COTEST!!!!!!!!!!!
+
+@ apex/portal5/pages/f101_page_166.sql;
+@ apex/portal5/pages/f101_page_155.sql;
+
+@ hrmbl/packages/p$bl_eva.pks;
+@ hrmbl/packages/p$bl_eva.pkb;
+@ hrmbl/packages/p$bl_eva_portal5.pkb;
+
+@ apex/core/pages/f100_page_154.sql;
+
+-- kopirati
+--@ apex/static_files/hrmb/plugins/evidencija_kalendar/js/evidencija_kalendar_1.0.2.js
+@ hrmbl/packages/p$bl_eva_portal5.pkb;
+
+@ apex/core/pages/f100_page_677.sql;
+
+@ hrmbl/views/v_hij_orgjed_form.sql;
+
+@ apex/portal5/pages/f101_page_176.sql;
+@ apex/portal5/pages/f101_page_150.sql;
+
+@ hrmbl/views/isplata_podaci.sql;
+@ hrmbl/views/zupanija.sql;
+
+drop trigger hrmbl.trg$at_viroso_iud;
+drop trigger hrmbl.trg$at_predvir_iud;
+drop trigger hrmbl.trg$at_lja_iud;
+drop trigger hrmbl.trg$at_ujed_iud;
+drop trigger hrmbl.trg$at_vir_iud;
+
+@ apex/core/pages/f100_page_193.sql;
+
+@ hrmbl/packages/place_virmani2.pkb;
+@ hrmbl/packages/place_virmani2.pkb;
+
+grant select on hrmbl.v$at_ben to hrm_portal;
+grant select on hrmbl.v$at_benvr to hrm_portal;
+grant select on hrmbl.v$at_grupioso to hrm_portal;
+create or replace synonym hrm_portal.v$at_ben for hrmbl.v$at_ben;
+create or replace synonym hrm_portal.v$at_benvr for hrmbl.v$at_benvr;
+create or replace synonym hrm_portal.v$at_grupioso for hrmbl.v$at_grupioso;
+@ apex/portal5/pages/f101_page_151.sql;
+
+@ apex/core/pages/f100_page_609.sql;
+@ hrmbl/views/reports/v$rep_i0004.sql;
+
+@ hrmbl/packages/p$utl_rep.pkb;
+
+@ apex/portal5/list_of_values/f101_lovs_eva_id_pregled.sql;
+@ apex/portal5/pages/f101_page_150.sql;
+@ apex/portal5/pages/f101_page_162.sql;
+@ apex/portal5/pages/f101_page_10.sql;
+
+@ hrm_portal/packages/p$bl_dashboard.pkb;
+@ apex/portal5/pages/f101_page_160.sql;
+
+@ hrmbl/packages/p$bl_orgjedhij_tree.pkb;
+
+@ hrmbl/views/v$bl_ukupno_terecenje.sql;
+grant select on hrmbl.v$bl_ukupno_terecenje  to HRMPR;
+
+@ hrmbl/packages/p$bl_virman_bilog.pks;
+@ hrmbl/packages/p$bl_virman_bilog.pkb;
+grant execute on hrmbl.p$bl_virman_bilog to HRMPR;
+
+@ apex/core/pages/f100_page_696.sql;
+
+@ hrmbl/functions/provjeri_iban.sql;
+
+@ apex/core/pages/f100_page_374.sql;
+@ apex/core/pages/f100_page_1509.sql;
+
+@ hrmbl/views/banka.sql;
+@ hrmbl/views/rs_obrazac.sql;
+@ hrmbl/views/rs_obrazac_stavka.sql;
+@ hrmbl/views/h$osoba.sql;
+@ hrmbl/views/flex_token.sql;
+@ hrmbl/views/flex_definicija.sql;
+
+@ hrmbl/packages/place_datoteka.pks;
+@ hrmbl/packages/place_datoteka.pkb;
+
+@ hrmbl/packages/p$bl_ota.pkb;
+@ hrmbl/packages/p$bl_era.pkb;
+@ hrmbl/packages/p$bl_ord.pks;
+@ hrmbl/packages/p$bl_ord.pkb;
+@ hrmbl/packages/p$bl_osa.pks;
+@ hrmbl/packages/p$bl_osa.pkb;
+@ hrm_portal/packages/p$bl_pocetna5.pkb;
+
+@ apex/portal5/pages/f101_page_10.sql;
+@ apex/portal5/pages/f101_page_162.sql;
+
+update hrm.konfiguracija set query_source = 'select tekst as dv, vrijednost as rv from v$bl_ulimvt where oznaka = ''S_DA_NE''' where oznaka = 'ZAKLJUCIVANJE_EVRAD_FOND_SATI';
+insert into hrm.utl_poruka values ('EVA.LOCK_PROVJERA', 'INFO', 'HR', 'Za sljedeće osobe evidencija neće biti zaključena:');
+commit;
+
+@ hrmbl/packages/p$bl_eva.pks;
+@ hrmbl/packages/p$bl_eva.pkb;
+@ apex/portal5/pages/f101_page_176.sql;
+
+@ apex/core/pages/f100_page_601.sql;
+
+@ hrmbl/packages/p$bl_pra.pks;
+@ hrmbl/packages/p$bl_pra.pkb;
+@ hrmbl/packages/p$bl_ozv.pkb;
+
+@ hrmbl/packages/p$bl_virman_bilog.pks;
+@ hrmbl/packages/p$bl_virman_bilog.pkb;
+
+@ hrmbl/packages/p$bl_place_datoteka_bilog.pks;
+@ hrmbl/packages/p$bl_place_datoteka_bilog.pkb;
+grant execute on hrmbl.p$bl_place_datoteka_bilog to HRMPR;
+
+@ apex/core/pages/f200_page_38.sql;
+@ apex/core/pages/f200_page_34.sql;
+@ apex/core/pages/f200_page_32.sql;
+@ apex/core/pages/f200_page_550.sql;
+@ apex/core/pages/f200_page_500.sql;
+@ apex/core/pages/f200_page_30.sql;
+@ apex/core/pages/f200_page_28.sql;
+@ apex/core/pages/f200_page_24.sql;
+@ apex/core/pages/f200_page_2.sql;
+
+
+
+@ hrmbl/packages/p$bl_joppd.pkb;
+@ hrmbl/packages/p$bl_joppd.pks;
+@ hrmbl/packages/place.pkb;
+@ hrmbl/functions/getBrojSati.sql;
+@ hrmbl/views/joppd_greske.sql;
+@ hrmbl/views/v_joppd_pregled.sql;
+
+ alter table hrm.joppd_obrazac modify F_OZNAKA_PODNOSITELJA default 'OZNAKA_PODNOSITELJA';
+ drop trigger trg$at_joppd_iud;
+ drop trigger trg$at_joppdl_iud;
+
+ 
+ ---- pusteno na CO TEST -u !!!!!!!!!!!!!!
+ 
+INSERT INTO utl_list_item (tablica, kolona, ulimvt_oznaka)
+VALUES ('VRSTA_PRIHODA','FORMULA','VRPRI.FORMULA');
+INSERT INTO utl_list_item (tablica, kolona, ulimvt_oznaka)
+VALUES ('VRSTA_PRIHODA','FOND_SATI','VRPRI.FOND_SATI');
+
+insert into utl_list_item_vrijednost(oznaka, vrijednost, tekst, poredak, jezik, aktivno) 
+values ('VRPRI.FORMULA','RAD','Rad', 1,'HR','1');
+insert into utl_list_item_vrijednost(oznaka, vrijednost, tekst, poredak, jezik, aktivno) 
+values ('VRPRI.FORMULA','NAGRADA','Nagrada', 2,'HR','1');
+insert into utl_list_item_vrijednost(oznaka, vrijednost, tekst, poredak, jezik, aktivno) 
+values ('VRPRI.FORMULA','ZADANI_NETTO','Zadani netto', 3,'HR','1');
+insert into utl_list_item_vrijednost(oznaka, vrijednost, tekst, poredak, jezik, aktivno) 
+values ('VRPRI.FORMULA','BOLOVANJE_HZZO','Bolovanje (HZZO)', 4,'HR','1');
+insert into utl_list_item_vrijednost(oznaka, vrijednost, tekst, poredak, jezik, aktivno) 
+values ('VRPRI.FORMULA','NEMA_IZRACUN','Nema izračuna', 5,'HR','1');
+insert into utl_list_item_vrijednost(oznaka, vrijednost, tekst, poredak, jezik, aktivno) 
+values ('VRPRI.FORMULA','MINULI_RAD','Minuli rad', 6,'HR','1');
+insert into utl_list_item_vrijednost(oznaka, vrijednost, tekst, poredak, jezik, aktivno) 
+values ('VRPRI.FORMULA','NAGRADAPDV','Nagrada s PDV-om', 7,'HR','1');
+insert into utl_list_item_vrijednost(oznaka, vrijednost, tekst, poredak, jezik, aktivno) 
+values ('VRPRI.FORMULA','POSTOTAK_OSNOVNE_PLACE','Postotak osnovne plaće', 8,'HR','1');
+insert into utl_list_item_vrijednost(oznaka, vrijednost, tekst, poredak, jezik, aktivno) 
+values ('VRPRI.FORMULA','POSTOTAK_OSNOVNE_PLACE_FS','Postotak osnovne plaće - fond sati', 9,'HR','1');
+insert into utl_list_item_vrijednost(oznaka, vrijednost, tekst, poredak, jezik, aktivno) 
+values ('VRPRI.FORMULA','NAGRADA_PRS_BROJ_DANA','Nagrada - prisutnost broj dana', 10,'HR','1');
+insert into utl_list_item_vrijednost(oznaka, vrijednost, tekst, poredak, jezik, aktivno) 
+values ('VRPRI.FORMULA','NAGRADA_PRS_BROJ_SATI','Nagrada - prisutnost broj sati', 11,'HR','1');
+insert into utl_list_item_vrijednost(oznaka, vrijednost, tekst, poredak, jezik, aktivno) 
+values ('VRPRI.FORMULA','POSTOTAK_BRUTTO','Postotak iz brutto plaće', 12,'HR','1');
+insert into utl_list_item_vrijednost(oznaka, vrijednost, tekst, poredak, jezik, aktivno) 
+values ('VRPRI.FORMULA','POSTOTAK_CILJANE_PLACE','Postotak ciljane plaće', 14,'HR','1');
+insert into utl_list_item_vrijednost(oznaka, vrijednost, tekst, poredak, jezik, aktivno) 
+values ('VRPRI.FORMULA','POSTOTAK_OP_PLUS_MINULI','Postotak osnovne plaće plus minuli rad', 13,'HR','1');
+
+insert into utl_list_item_vrijednost(oznaka, vrijednost, tekst, poredak, jezik, aktivno) 
+values ('VRPRI.FOND_SATI','3','Prethodna 3 mjeseca', 4,'HR','1');
+insert into utl_list_item_vrijednost(oznaka, vrijednost, tekst, poredak, jezik, aktivno) 
+values ('VRPRI.FOND_SATI','6','Prethodnih 6 mjeseci', 5,'HR','1');
+insert into utl_list_item_vrijednost(oznaka, vrijednost, tekst, poredak, jezik, aktivno) 
+values ('VRPRI.FOND_SATI','B','Prethodne plaće - bolovanje', 6,'HR','1');
+insert into utl_list_item_vrijednost(oznaka, vrijednost, tekst, poredak, jezik, aktivno) 
+values ('VRPRI.FOND_SATI','G','Prosječni godišnji', 2,'HR','1');
+insert into utl_list_item_vrijednost(oznaka, vrijednost, tekst, poredak, jezik, aktivno) 
+values ('VRPRI.FOND_SATI','M','Mjesečni', 1,'HR','1');
+insert into utl_list_item_vrijednost(oznaka, vrijednost, tekst, poredak, jezik, aktivno) 
+values ('VRPRI.FOND_SATI','O','Prethodni mjesec - osnovni sati', 7,'HR','1');
+insert into utl_list_item_vrijednost(oznaka, vrijednost, tekst, poredak, jezik, aktivno) 
+values ('VRPRI.FOND_SATI','P','Prethodni mjesec', 3,'HR','1');
+insert into utl_list_item_vrijednost(oznaka, vrijednost, tekst, poredak, jezik, aktivno) 
+values ('VRPRI.FOND_SATI','R','Prethodni iz grupe primanja', 8,'HR','1');
+
+INSERT INTO utl_list_item (tablica, kolona, ulimvt_oznaka)
+VALUES ('VRSTA_RASHODA','FORMULA','VRRAS.FORMULA');
+
+insert into utl_list_item_vrijednost(oznaka, vrijednost, tekst, poredak, jezik, aktivno) 
+values ('VRRAS.FORMULA','DOPRINOSI_IZ','Doprinosi iz plaće', 1,'HR','1');
+insert into utl_list_item_vrijednost(oznaka, vrijednost, tekst, poredak, jezik, aktivno) 
+values ('VRRAS.FORMULA','DOPRINOSI_NA','Doprinosi na plaću', 2,'HR','1');
+insert into utl_list_item_vrijednost(oznaka, vrijednost, tekst, poredak, jezik, aktivno) 
+values ('VRRAS.FORMULA','POREZ','Porez', 3,'HR','1');
+insert into utl_list_item_vrijednost(oznaka, vrijednost, tekst, poredak, jezik, aktivno) 
+values ('VRRAS.FORMULA','PRIREZ','Prirez', 4,'HR','1');
+insert into utl_list_item_vrijednost(oznaka, vrijednost, tekst, poredak, jezik, aktivno) 
+values ('VRRAS.FORMULA','IZNOS_IZ_NETTO','Iznos iz netto', 5,'HR','1');
+insert into utl_list_item_vrijednost(oznaka, vrijednost, tekst, poredak, jezik, aktivno) 
+values ('VRRAS.FORMULA','POSTOTAK_IZ_NETTO','Postotak iz netto', 6,'HR','1');
+insert into utl_list_item_vrijednost(oznaka, vrijednost, tekst, poredak, jezik, aktivno) 
+values ('VRRAS.FORMULA','OBUSTAVA_IZ_GRUPE','Obustava iz grupe', 7,'HR','1');
+insert into utl_list_item_vrijednost(oznaka, vrijednost, tekst, poredak, jezik, aktivno) 
+values ('VRRAS.FORMULA','POSEBAN_POREZ_BIH','Poseban porez (BIH)', 8,'HR','1');
+insert into utl_list_item_vrijednost(oznaka, vrijednost, tekst, poredak, jezik, aktivno) 
+values ('VRRAS.FORMULA','POLJOPRIVREDA_BIH','Poljoprivreda (BIH)', 9,'HR','1');
+insert into utl_list_item_vrijednost(oznaka, vrijednost, tekst, poredak, jezik, aktivno) 
+values ('VRRAS.FORMULA','POREZ_PRIJEVOZ','Porez na prijevoz', 10,'HR','1');
+insert into utl_list_item_vrijednost(oznaka, vrijednost, tekst, poredak, jezik, aktivno) 
+values ('VRRAS.FORMULA','IZRACUNATI_NETTO','Izračunati netto', 11,'HR','1');
+insert into utl_list_item_vrijednost(oznaka, vrijednost, tekst, poredak, jezik, aktivno) 
+values ('VRRAS.FORMULA','VODOSTOPANSTVO_MKD','Vodostopanstvo (MKD)', 12,'HR','1');
+insert into utl_list_item_vrijednost(oznaka, vrijednost, tekst, poredak, jezik, aktivno) 
+values ('VRRAS.FORMULA','PKCG','Stopa doprinosa za privrednu komoru Crne Gore ', 13,'HR','1');
+insert into utl_list_item_vrijednost(oznaka, vrijednost, tekst, poredak, jezik, aktivno) 
+values ('VRRAS.FORMULA','SSS_CG','Stopa sindikalne članarine (CG)', 14,'HR','1');
+insert into utl_list_item_vrijednost(oznaka, vrijednost, tekst, poredak, jezik, aktivno) 
+values ('VRRAS.FORMULA','POREZ_NA','Porez na plaću', 15,'HR','1');
+insert into utl_list_item_vrijednost(oznaka, vrijednost, tekst, poredak, jezik, aktivno) 
+values ('VRRAS.FORMULA','SOCIJALNA_ZASTITA_BIH','Socijalna zaštita (BIH)', 16,'HR','1');
+insert into utl_list_item_vrijednost(oznaka, vrijednost, tekst, poredak, jezik, aktivno) 
+values ('VRRAS.FORMULA','POSTOTAK_IZ_NETTO2','Postotak iz netto - krizni', 17,'HR','1');
+insert into utl_list_item_vrijednost(oznaka, vrijednost, tekst, poredak, jezik, aktivno) 
+values ('VRRAS.FORMULA','POSTOTAK_IZ_BRUTTO','Postotak iz obračunatog brutta', 18,'HR','1');
+insert into utl_list_item_vrijednost(oznaka, vrijednost, tekst, poredak, jezik, aktivno) 
+values ('VRRAS.FORMULA','PRIREZ_CG','Prirez', 14,'HR','1');
+
+-- END OF pusteno na CO TEST-U ------------------
+
+@ hrmbl/packages/p$bl_joppd.pkb;
+@ hrmbl/packages/p$bl_joppd.pks;
+@ hrmbl/views/v$bl_vrpri_formula.sql;
+
+@ apex/portal5/lists/f101_list_moj_profil_preostali_dani_go.sql;
+
+@ hrmbl/packages/p$bl_kae.pks;
+@ hrmbl/packages/p$bl_kae.pkb;
+@ apex/portal5/f101.sql;
+
+@ apex/core/pages/f100_page_521.sql;
+
+@ hrmbl/packages/p$bl_banrac.pks;
+@ hrmbl/packages/p$bl_banrac.pkb;
+
+GRANT EXECUTE ON "HRMBL"."P$BL_BANRAC" TO "HRMPR";
+/
+
+CREATE OR REPLACE SYNONYM "HRMPR"."P$BL_BANRAC" FOR "HRMBL"."P$BL_BANRAC";
+/
+@ apex/core/pages/f100_page_439.sql;
+@ apex/core/lists/f100_list_meni-glavni.sql;
+
+insert into hrm.utl_poruka values ('LOGIN.OUTDATED_BROWSER', 'INFO', 'HR', 'Trenuto koristite nepodržanu verziju preglednika!');
+commit;
+
+@ apex/portal5/pages/f101_page_101.sql;
+
+@ apex/core/pages/f100_page_521.sql;
+
+@ hrmbl/packages/p$bl_eva_portal5.pkb;
+@ apex/portal5/pages/f101_page_176.sql;
+
+@ hrmbl/views/reports/v$rep_i0030.sql;
+@ apex/core/pages/f100_page_649.sql;
+begin
+  for i in (select * from hrm.kontekst)
+  loop
+insert into hrm.utl_report (oznaka, file_name, opis, page_number, naziv, aktivno, vrsta,kon_id)
+values
+('i0030','i0030','', 649, 'Pregled korištenja GO', 1, '', i.id);
+  end loop;
+end;
+begin
+  for i in (select * from hrm.kontekst)
+  loop
+insert into hrm.utl_rep_grupiranje (urga_id, poredak, kon_id, urt_oznaka)
+values
+(34267,7,i.id, 'i0030');
+  end loop;
+end;
+insert into hrm.utl_rep_page_params
+(page_id, item, parametar, urt_oznaka, poredak)
+values
+(649, 'P649_GODINA', 'GODINA', 'i0030', 1);
+insert into hrm.utl_rep_page_params
+(page_id, item, parametar, urt_oznaka, poredak)
+values
+(649, 'P649_TVRTKA', 'TTA_ID', 'i0030', 2 );
+insert into hrm.utl_rep_page_params
+(page_id, item, parametar, urt_oznaka, poredak)
+values
+(649, 'P649_ORGJED', 'ORGJED_ID','i0030',3);
+insert into hrm.utl_rep_page_params
+(page_id, item, parametar, urt_oznaka, poredak)
+values
+(649, 'P649_OSA_ID', 'OSA_ID','i0030',4);
+COMMIT;
+
+@ apex/core/pages/f100_page_439.sql;
+
+insert into HRM.konfiguracija (id, oznaka, vrijednost, komentar, kon_id, query_source)
+  select seq_id.nextval
+       , 'EVA_ID.PREDLAGANJE_RR'
+       , (SELECT MIN(eva.id)      
+          FROM hrm.evid_rada_vrsta eva
+          JOIN hrm.evid_rada_grupa ega ON (eva.ega_id = ega.id)
+         WHERE ega.sifra = 'RR'
+           AND eva.aktivno = 1
+           AND ega.kon_id = eva.kon_id
+           AND eva.kon_id = k.id)
+       , 'Vrsta evidencije koja se koristi kod predlaganja redovnog rada, ako nije drugačije definirano rasporedom vremena'
+       , id
+       , 'SELECT eva.naziv, eva.id FROM v$at_eva eva WHERE eva.aktivno = 1 ORDER BY 1' 
+    from hrm.kontekst k;
+    
+    
+insert into HRM.konfiguracija (id, oznaka, vrijednost, komentar, kon_id, query_source)
+  select seq_id.nextval
+       , 'EVA_ID.PREDLAGANJE_BLG'
+       , (SELECT MIN(eva.id)      
+          FROM hrm.evid_rada_vrsta eva
+          JOIN hrm.evid_rada_grupa ega ON (eva.ega_id = ega.id)
+         WHERE ega.sifra = 'BLG'
+           AND eva.aktivno = 1
+           AND ega.kon_id = eva.kon_id
+           AND eva.kon_id = k.id)
+       , 'Vrsta evidencije koja se koristi kod predlaganja blagdana iz kalendara'
+       , id
+       , 'SELECT eva.naziv, eva.id FROM v$at_eva eva WHERE eva.aktivno = 1 ORDER BY 1' 
+    from hrm.kontekst k;  
+
+commit;
+
+@ hrmbl/packages/p$bl_era.pkb;

@@ -1,0 +1,74 @@
+{
+	"header": [
+		"-- created by buildGenerator\n",
+        "-- timestamp #TIME#\n",
+		"--\n",
+        "\n",
+        "\n",
+		"SET VERIFY OFF\n",
+		"SET DOCUMENT OFF\n",
+		"SET SCAN ON\n"
+	],
+	
+	"errorHandlerContinue" : [
+		"WHENEVER SQLERROR CONTINUE"
+	],
+
+	"errorHandlerExit" : "WHENEVER SQLERROR EXIT\n",
+
+	"connectTestBefore": " testing #DB#\n",
+
+	"connectTest": "CONNECT #DB#\n",
+
+	"connectTestAfter": " connected successfully #DB#\n",
+
+	"connectCommand" : [
+		"SET SCAN ON\n",
+		"CONNECT #DB#\n", 
+		"SET SCAN OFF\n",
+		"SET SERVEROUTPUT ON SIZE 1000000\n"
+	],
+
+	"logPrefix" : "PRO",
+    "includeChar" : "@",
+    "exit": [
+            "SPOOL OFF\n\n\n",
+            "EXIT \n\n"
+        ],
+    
+    "changelogChunk": "changelog.chunk.sql",
+
+    "buildFile": "build.sql",
+
+    "installLog": "SPOOL install.log",
+
+    "notifyDDL" : "--- POPRATITI OVO (PVO)\n",
+
+    "ddlKeyWords": ["ALTER", "UPDATE", "INSERT", "GRANT", "REVOKE", "DROP", "DELETE", "SYNONYM", "COMMENT"],
+
+    "InvalidSpool": "SPOOL invalid.log\n",
+    
+    "spoolOff": "SPOOL OFF\n",
+
+    "logUserMsg" :"schema #DB# ....",
+
+    "recompileFile" : "recompile.sql",
+
+    "invalidFile": "invalid.sql",
+
+    "exportSQL" : "select Object_name || ', ' || object_type as invalid_objects from USER_OBJECTS where status != 'VALID';\n\n",
+    
+    "recompileSpool": "SPOOL recompile.log\n",
+    
+    "recompileCommand": "EXEC DBMS_UTILITY.compile_schema(schema => '#USER#');\n/",
+
+    "commentVarifyConn": "-------- Verify connections: -------- \n",
+
+    "commentVarifyConnEnd": "-------- END of Verify connections: -------- \n",
+
+    "spaceChunk": "\n\n\n",
+
+    "outputDir": "build/",
+
+    "newLine": "\n"
+}

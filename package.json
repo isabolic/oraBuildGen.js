@@ -1,0 +1,16 @@
+{
+  "name": "buid-generator",
+  "version": "0.0.1",
+  "description": "build sql script for deployment",
+  "main": "buildGenerator.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "isabolic",
+  "license": "ISC",
+  "dependencies": {
+    "deferred": "^0.7.5",
+    "promise": "^7.1.1",
+    "properties-reader": "0.0.15"
+  }
+}
