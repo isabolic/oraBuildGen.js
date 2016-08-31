@@ -7,7 +7,7 @@
         "\n",
 		"SET VERIFY OFF\n",
 		"SET DOCUMENT OFF\n",
-		"SET SCAN ON\n"
+		"SET SCAN ON\n"        
 	],
 	
 	"errorHandlerContinue" : [
@@ -26,7 +26,9 @@
 		"SET SCAN ON\n",
 		"CONNECT #DB#\n", 
 		"SET SCAN OFF\n",
-		"SET SERVEROUTPUT ON SIZE 1000000\n"
+		"SET SERVEROUTPUT ON SIZE 1000000\n",
+        "SET SQLBLANKLINES ON\n",
+        "SET SQLTERMINATOR ';'\n"
 	],
 
 	"logPrefix" : "PRO",
@@ -42,11 +44,21 @@
 
     "installLog": "SPOOL install.log",
 
-    "notifyDDL" : "--- POPRATITI OVO (PVO)\n",
+    "notifyBefore" : "--- POPRATITI OVO (PVO)",
 
-    "ddlKeyWords": ["ALTER", "UPDATE", "INSERT", "GRANT", "REVOKE", "DROP", "DELETE", "SYNONYM", "COMMENT"],
+    "notifyAfter" :  "--- POPRATITI OVO KRAJ (PVO_END)",
 
-    "InvalidSpool": "SPOOL invalid.log\n",
+    "ddlKeyWordsForceNotify" : ["INSERT", "BEGIN", "END", "SYNONYM"],
+
+    "PlSqlBlocks" : ["BEGIN", "END"],
+
+    "notifyBeforePLSQLBLocks" : "--- POPRATITI OVO pl-sql block (PVO)",
+
+    "ddlKeyWords": ["ALTER", "UPDATE", "INSERT", "CREATE", "GRANT", "REVOKE", "DROP", "DELETE", "SYNONYM", "COMMENT", "COMMIT"],
+
+    "InvalidBeforeSpool": "SPOOL invalid_before.log\n",
+    
+    "InvalidAfterSpool": "SPOOL invalid_after.log\n",
     
     "spoolOff": "SPOOL OFF\n",
 
@@ -54,13 +66,15 @@
 
     "recompileFile" : "recompile.sql",
 
-    "invalidFile": "invalid.sql",
+    "invalidAfterFile": "invalid_after.sql",
 
-    "exportSQL" : "select Object_name || ', ' || object_type as invalid_objects from USER_OBJECTS where status != 'VALID';\n\n",
+    "invalidBeforeFile": "invalid_before.sql",
+
+    "exportSQL" : "select Object_name || ', ' || object_type as invalid_objects from USER_OBJECTS where status != 'VALID' order by object_name;\n\n",
     
     "recompileSpool": "SPOOL recompile.log\n",
     
-    "recompileCommand": "EXEC DBMS_UTILITY.compile_schema(schema => '#USER#');\n/",
+    "recompileCommand": "EXEC DBMS_UTILITY.compile_schema(schema => '#USER#', compile_all => false);\n",
 
     "commentVarifyConn": "-------- Verify connections: -------- \n",
 
